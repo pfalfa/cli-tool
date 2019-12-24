@@ -31,7 +31,7 @@
     "/oclif.manifest.json",
     "/src"
   ],
-  "homepage": "https://github.com/adisetiawan/pfalfa/cli-tool",
+  "homepage": "https://github.com/pfalfa/cli-tool",
   "keywords": [
     "oclif"
   ],
@@ -44,7 +44,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "adisetiawan/pfalfa/cli-tool",
+  "repository": "pfalfa/cli-tool",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
