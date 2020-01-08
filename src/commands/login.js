@@ -1,7 +1,7 @@
 const Table = require('cli-table')
 const { prompt } = require('inquirer')
 const { Command, flags } = require('@oclif/command')
-const { api, msg, db } = require('../utils')
+const { api, msg, db, gundb } = require('../utils')
 
 class LoginCommand extends Command {
   async run() {
@@ -39,18 +39,18 @@ class LoginCommand extends Command {
 
     api
       .post(api.host.ihub, 'auth/login', { email, passphare })
-      .then(resp => {
-        const { success, message, data } = resp
-        if (!success) return this.log(msg.fail(message))
-
+      .then(async resp => {
+        const { success, data } = resp
         const table = new Table()
-        const user = {
-          email: (data && data.profile && data.profile.email) || '',
-          pubkey: (data && data.pub) || '',
-        }
+        const val = success
+          ? {
+              email: (data && data.profile && data.profile.email) || '',
+              pubkey: (data && data.pub) || '',
+            }
+          : await gundb.auth(email, passphare)
 
-        db.write(user)
-        table.push({ Email: user.email }, { 'Public Key': user.pubkey })
+        db.write(val)
+        table.push({ Email: val.email }, { 'Public Key': val.pubkey })
         return this.log(table.toString())
       })
       .catch(error => {

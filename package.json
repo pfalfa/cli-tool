@@ -14,10 +14,12 @@
     "chalk": "^3.0.0",
     "cli-table": "^0.3.1",
     "form-data": "^3.0.0",
+    "gun": "^0.2019.1228",
     "inquirer": "^7.0.3",
     "jsonfile": "^5.0.0",
     "moment": "^2.24.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "ps-node": "^0.1.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",

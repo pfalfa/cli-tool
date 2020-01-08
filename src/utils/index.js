@@ -1,5 +1,6 @@
+const db = require('./db')
 const api = require('./api')
 const msg = require('./msg')
-const db = require('./db')
+const gundb = require('./gundb')
 
-module.exports = { api, msg, db }
+module.exports = { api, msg, db, gundb }
