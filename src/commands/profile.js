@@ -1,10 +1,25 @@
-const {Command, flags} = require('@oclif/command')
+const Table = require('cli-table')
+const { Command } = require('@oclif/command')
+const { api, msg, db } = require('../utils')
 
 class ProfileCommand extends Command {
   async run() {
-    const {flags} = this.parse(ProfileCommand)
-    const name = flags.name || 'world'
-    this.log(`hello ${name} from /Users/adisetiawan/project/pfalfa-cli-tool/src/commands/profile.js`)
+    const user = await db.read()
+    if (user === undefined) return this.log(msg.error('Please login first!'))
+
+    api
+      .get(api.host.ihub, 'users', user.pubkey)
+      .then(resp => {
+        const { success, message, data } = resp
+        if (!success) return this.log(msg.fail(message))
+
+        const table = new Table()
+        table.push({ Email: data.alias }, { 'Public Key': data.pub })
+        return this.log(table.toString())
+      })
+      .catch(error => {
+        return this.log(msg.error(error))
+      })
   }
 }
 
