@@ -4,7 +4,7 @@ const moment = require('moment')
 const Table = require('cli-table')
 const { prompt } = require('inquirer')
 const { Command, flags } = require('@oclif/command')
-const { api, msg, db } = require('../utils')
+const { api, msg, db, killpid } = require('../utils')
 
 const categories = ['High-Rish', 'Game', 'Gambling', 'Exchange', 'Finance', 'Social', 'Art', 'Tools', 'Others']
 
@@ -78,25 +78,44 @@ class DeployCommand extends Command {
       if (error) return this.log(msg.error(error.message))
       if (path.extname(file) !== '.zip') return this.log(msg.error('File DApp must be compressed with extension zip'))
 
+      /** created dapp */
       api
         .post(api.host.pfalfa, 'dapps', { podName: name, category, description }, user.pubkey)
         .then(async resp => {
           const { success, message, data } = resp
           if (!success) return this.log(msg.fail(message))
 
+          /** upload ipfs */
           const respUpload = await api.upload(api.host.pfalfa, 'ipfs/upload', file, user.pubkey)
-          const table = new Table()
-          table.push(
-            { 'DApp Name': data.name },
-            { Category: data.category },
-            { 'IP Public': data.ipPublic ? data.ipPublic : '' },
-            { Port: data.port ? data.port : '' },
-            { 'Gun DB': data.gunDb ? data.gunDb : '' },
-            { Status: data.status },
-            { 'File Hash': respUpload.success ? respUpload.data.hash : '' },
-            { 'Created At': moment(data.createdAt).format('DD MMM YYYY hh:mm:ss') }
-          )
-          return this.log(table.toString())
+
+          /** updated dapp */
+          api
+            .put(api.host.pfalfa, `dapps/${data.id}`, { ipfsHash: respUpload.data.hash }, user.pubkey)
+            .then(async resp => {
+              const { success, data } = resp
+              if (!success) {
+                await api.del(api.host.pfalfa, `dapps/${data.id}`, user.pubkey)
+                return this.log(msg.fail(message))
+              }
+
+              const table = new Table()
+              table.push(
+                { 'DApp Name': data.name },
+                { Category: data.category },
+                { 'IP Public': data.ipPublic ? data.ipPublic : '' },
+                { Port: data.port ? data.port : '' },
+                { 'Gun DB': data.gunDb ? data.gunDb : '' },
+                { Status: data.status },
+                { 'File Hash': respUpload.success ? respUpload.data.hash : '' },
+                { 'Created At': moment(data.createdAt).format('DD MMM YYYY hh:mm:ss') }
+              )
+              killpid()
+              return this.log(table.toString())
+            })
+            .catch(async error => {
+              await api.del(api.host.pfalfa, `dapps/${data.id}`, user.pubkey)
+              return this.log(msg.error(error))
+            })
         })
         .catch(error => {
           return this.log(msg.error(error))

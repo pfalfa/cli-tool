@@ -1,7 +1,7 @@
 const moment = require('moment')
 const Table = require('cli-table')
 const { Command } = require('@oclif/command')
-const { api, msg, db } = require('../utils')
+const { api, msg, db, killpid } = require('../utils')
 
 class ListCommand extends Command {
   async run() {
@@ -35,6 +35,8 @@ class ListCommand extends Command {
       .catch(error => {
         return this.log(msg.error(error))
       })
+
+    killpid()
   }
 }
 

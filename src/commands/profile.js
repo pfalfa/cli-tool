@@ -1,6 +1,6 @@
 const Table = require('cli-table')
 const { Command } = require('@oclif/command')
-const { api, msg, db } = require('../utils')
+const { api, msg, db, killpid } = require('../utils')
 
 class ProfileCommand extends Command {
   async run() {
@@ -20,6 +20,8 @@ class ProfileCommand extends Command {
       .catch(error => {
         return this.log(msg.error(error))
       })
+
+    killpid()
   }
 }
 
