@@ -1,6 +1,7 @@
+const Table = require('cli-table')
 const { prompt } = require('inquirer')
 const { Command, flags } = require('@oclif/command')
-const { api, msg } = require('../utils')
+const { api, msg, db } = require('../utils')
 
 class LoginCommand extends Command {
   async run() {
@@ -41,7 +42,16 @@ class LoginCommand extends Command {
       .then(resp => {
         const { success, message, data } = resp
         if (!success) return this.log(msg.fail(message))
-        return this.log(msg.success(data))
+
+        const table = new Table()
+        const user = {
+          email: (data && data.profile && data.profile.email) || '',
+          pubkey: (data && data.pub) || '',
+        }
+
+        db.write(user)
+        table.push({ Email: user.email }, { 'Public Key': user.pubkey })
+        return this.log(table.toString())
       })
       .catch(error => {
         return this.log(msg.error(error))
@@ -49,14 +59,14 @@ class LoginCommand extends Command {
   }
 }
 
-LoginCommand.description = `Login to Pfalfa Identity Hub
-...
-Extra documentation goes here
-`
-
 LoginCommand.flags = {
   email: flags.string({ char: 'e', description: 'developer email (required)' }),
   passphare: flags.string({ char: 'p', description: 'developer passphare/password (required)' }),
 }
+
+LoginCommand.description = `Login to Pfalfa Identity Hub
+...
+Extra documentation goes here
+`
 
 module.exports = LoginCommand

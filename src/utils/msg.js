@@ -9,7 +9,7 @@ function fail(str) {
 }
 
 function success(str) {
-  return chalk.green(chalk.bold.green('[Fail]'), str)
+  return chalk.green(chalk.bold.green('[Success]'), str)
 }
 
 module.exports = msg = { error, fail, success }
