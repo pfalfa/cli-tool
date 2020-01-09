@@ -4,6 +4,7 @@
 /dist
 /tmp
 /db
+/bin/db
 /bin/*.json
 /yarn.lock
 node_modules
