@@ -18,7 +18,7 @@
     "inquirer": "^7.0.3",
     "jsonfile": "^5.0.0",
     "moment": "^2.24.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "ps-node": "^0.1.6"
   },
   "devDependencies": {
